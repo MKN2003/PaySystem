@@ -6,12 +6,22 @@ from users.models import UserModel, UserCardModel, TransferModel
 from users.serializers import UserModelSerializer, UserCardModelSerializer, TransferModelSerializer
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 # Create your views here.
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 2
+    max_page_size = 1000
 
 
 @api_view()
 def hell_world(request):
     return Response({'message': 'Hello world'})
+
 
 class TestAPIView(APIView):
 
@@ -31,9 +41,11 @@ class TestAPIView(APIView):
 class UserModelListAPIView(generics.ListAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserModelSerializer
-    filter_backends = [SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'email']
     permission_classes = [permissions.AllowAny]
+    pagination_class = StandardResultsSetPagination
+    filterset_fields = ['name', 'phone_number']
 
 
 class UserModelCreateAPIView(generics.CreateAPIView):
@@ -117,3 +129,11 @@ class TransferModelRetrieveAPIview(generics.RetrieveAPIView):
     queryset = TransferModel.objects.all()
     serializer_class =TransferModelSerializer
 
+
+class Home(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        content = {'message': 'Hello, World!'}
+        return Response(content)

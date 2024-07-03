@@ -1,3 +1,4 @@
+from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 
 # Create your models here.
@@ -14,7 +15,7 @@ class UserModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     class Meta:
         verbose_name = 'User'
@@ -26,6 +27,7 @@ class UserCardModel(models.Model):
     card_Number = models.IntegerField()
     balance = models.FloatField(default=0)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    description = RichTextUploadingField(null=True, blank=True)
     exp_date = models.IntegerField()
 
     def __str__(self):
